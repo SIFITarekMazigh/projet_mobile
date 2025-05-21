@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:projet_mobile/pages/splash_page.dart';
+import 'package:projet_mobile/pages/home/home.dart';
+import 'package:projet_mobile/pages/login/login.dart';
+import 'package:projet_mobile/pages/signup/signup.dart';
+import 'package:projet_mobile/services/supabase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-      url: 'https://qoushokbgoezkmtvzuze.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvdXNob2tiZ29lemttdHZ6dXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzQ0NTcsImV4cCI6MjA2MzM1MDQ1N30.zpM30g-ln55EfPOyq4xF-gntLGD9D6NPMwlTQz-78CA'
+      url: SupabaseOptions.supabaseUrl,
+      anonKey: SupabaseOptions.supabaseAnonKey
   );
   runApp(const MyApp());
 }
@@ -34,7 +37,70 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
-      home: const SplashPage(),
+      initialRoute: '/splash',
+      routes: {
+        '/splash': (context) => const SplashPage(),
+        '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SignupPage(),
+        '/home': (context) => const HomePage(),
+      },
+    );
+  }
+}
+
+class SplashPage extends StatefulWidget {
+  const SplashPage({super.key});
+
+  @override
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  final _authClient = Supabase.instance.client.auth;
+
+  @override
+  void initState() {
+    super.initState();
+    _redirect();
+  }
+
+  Future<void> _redirect() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (mounted) {
+      if (_authClient.currentUser != null) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.face,
+              size: 80,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Système d\'Authentification Faciale',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            const CircularProgressIndicator(),
+          ],
+        ),
+      ),
     );
   }
 }

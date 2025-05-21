@@ -3,17 +3,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projet_mobile/main.dart';
-import 'package:projet_mobile/services/supabase_auth_service.dart';
+import 'package:projet_mobile/services/auth_service.dart';
 import 'package:projet_mobile/services/face_recognition_service.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _SignupPageState extends State<SignupPage> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   XFile? _faceImage;
@@ -27,7 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
-  final _authService = SupabaseAuthService();
+  final _authService = AuthService();
   final _faceRecognitionService = FaceRecognitionService();
   final _imagePicker = ImagePicker();
 

@@ -3,9 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projet_mobile/main.dart';
-import 'package:projet_mobile/pages/home_page.dart';
-import 'package:projet_mobile/pages/register_page.dart';
-import 'package:projet_mobile/services/supabase_auth_service.dart';
+import 'package:projet_mobile/services/auth_service.dart';
 import 'package:projet_mobile/services/face_recognition_service.dart';
 import 'package:projet_mobile/services/audio_service.dart';
 
@@ -26,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final _authService = SupabaseAuthService();
+  final _authService = AuthService();
   final _faceRecognitionService = FaceRecognitionService();
   final _audioService = AudioService();
   final _imagePicker = ImagePicker();
@@ -160,6 +158,7 @@ class _LoginPageState extends State<LoginPage> {
       final success = await _authService.signInWithFace(
         email: _emailController.text.trim(),
         faceImageBytes: _faceImageBytes!,
+        faceImage: _faceImage, // Passer l'image complète
       );
 
       if (success) {
@@ -168,9 +167,7 @@ class _LoginPageState extends State<LoginPage> {
 
         if (mounted) {
           context.showSnackBar('Authentification faciale réussie !');
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
+          Navigator.of(context).pushReplacementNamed('/home');
         }
       } else {
         // Play failure sound
@@ -216,9 +213,7 @@ class _LoginPageState extends State<LoginPage> {
         await _audioService.playSuccessSound();
 
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
+          Navigator.of(context).pushReplacementNamed('/home');
         }
       } else {
         // Play failure sound
@@ -253,9 +248,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _navigateToRegister() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const RegisterPage()),
-    );
+    Navigator.of(context).pushNamed('/signup');
   }
 
   @override
