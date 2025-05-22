@@ -35,14 +35,15 @@ Une application mobile de reconnaissance faciale développée avec Flutter et Su
 dependencies:
   flutter:
     sdk: flutter
-  supabase_flutter: ^2.0.0
-  google_ml_kit: ^0.16.0
-  image_picker: ^1.0.4
-  camera: ^0.10.5+5
-  path_provider: ^2.1.1
-  path: ^1.8.3
-  audioplayers: ^5.2.1
-  uuid: ^4.2.1
-  http: ^1.1.0
-  image: ^4.1.3
-  shared_preferences: ^2.2.0
+  cupertino_icons: ^1.0.2
+  supabase_flutter: ^2.9.0
+  google_ml_kit: ^0.20.0
+  image_picker: ^1.1.2
+  camera: ^0.11.1
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  audioplayers: ^6.4.0
+  uuid: ^4.5.1
+  http: ^1.4.0
+  image: ^4.5.4
+  shared_preferences: ^2.5.3
