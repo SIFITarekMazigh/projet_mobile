@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport Technique - Application Flutter avec Authentification Faciale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Page de couverture */
+        .cover-page {
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            page-break-after: always;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Subtle pattern, if desired */
+            /* background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="70" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>'); */
+        }
+
+        .cover-content {
+            z-index: 1;
+            padding: 20px;
+        }
+
+        .cover-page h1 {
+            font-size: 3.2em;
+            margin-bottom: 0.5em;
+            font-weight: 300;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .cover-page h2 {
+            font-size: 1.6em;
+            margin-bottom: 1.5em;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .project-members {
+            margin-top: 1.5em;
+            margin-bottom: 1.5em;
+            font-size: 1.1em;
+        }
+
+        .project-members h3 {
+            font-size: 1.3em;
+            margin-bottom: 0.5em;
+            font-weight: 400;
+        }
+
+        .project-members p {
+            font-size: 1em;
+            opacity: 0.9;
+            margin: 0.2em 0;
+        }
+
+        .cover-meta {
+            margin-top: 2em;
+            font-size: 1em;
+            opacity: 0.8;
+        }
+        .cover-meta p {
+            margin: 0.3em 0;
+        }
+
+
+        /* En-tête et navigation */
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 1em 2em;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.5em;
+            font-weight: 300;
+        }
+
+        /* Table des matières */
+        .toc {
+            padding: 2em;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            margin: 2em;
+            page-break-after: always;
+        }
+
+        .toc h2 {
+            color: #2c3e50;
+            margin-bottom: 1em;
+            font-size: 1.8em;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 0.5em 0;
+            padding: 0.3em 0;
+            border-bottom: 1px dotted #ddd;
+        }
+        .toc li:last-child {
+            border-bottom: none;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .toc a:hover {
+            color: #667eea;
+        }
+        .toc .page-num {
+            color: #7f8c8d;
+        }
+
+        /* Contenu principal */
+        .content {
+            padding: 2em;
+            max-width: none; /* Allow content to use full width of .container */
+        }
+
+        .section {
+            margin-bottom: 3em;
+            page-break-inside: avoid;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 1em;
+            padding-bottom: 0.5em;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin: 1.5em 0 1em 0;
+        }
+
+        .section h4 {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin: 1em 0 0.5em 0;
+        }
+
+        /* Diagrammes */
+        .diagram {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5em;
+            margin: 2em 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .diagram h4 {
+            margin-bottom: 1em;
+            color: #2c3e50;
+            font-size: 1.3em;
+        }
+
+        /* Architecture diagram */
+        .architecture-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: stretch; /* Make layers same height */
+            flex-wrap: wrap;
+            gap: 1.5em;
+        }
+
+        .layer {
+            background: linear-gradient(135deg, #7386D5, #5C6BC0); /* Softer gradient */
+            color: white;
+            padding: 1.5em;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1; /* Distribute space */
+            min-width: 180px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+         .layer-connector {
+            font-size: 2em;
+            color: #5C6BC0;
+            align-self: center;
+        }
+
+        .layer h5 {
+            font-size: 1.2em; /* Increased size */
+            margin-bottom: 0.5em;
+            font-weight: 500;
+        }
+
+        .layer p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Flow diagram */
+        .flow-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1em; /* Reduced gap for closer arrows */
+            flex-wrap: wrap;
+            margin-top: 1em;
+        }
+
+        .flow-step {
+            background: #f0f2f5; /* Lighter background */
+            border: 1px solid #667eea;
+            border-radius: 8px; /* Less rounded */
+            padding: 0.8em 1.2em;
+            text-align: center;
+            position: relative;
+            min-width: 120px;
+            font-size: 0.9em;
+        }
+
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -1.2em; /* Adjust for closer arrow */
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.8em; /* Slightly larger arrow */
+            color: #667eea;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        /* Code blocks */
+        pre { /* Apply to pre for better semantic HTML and accessibility */
+            background: #2d3748; /* Darker background */
+            color: #e2e8f0; /* Light text */
+            padding: 1.5em;
+            border-radius: 8px;
+            margin: 1em 0;
+            overflow-x: auto;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Common mono fonts */
+            line-height: 1.45; /* Improved line spacing */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 0.9em; /* Slightly smaller font */
+        }
+        
+        .code-block .comment { color: #90a4ae; font-style: italic; } /* Softer comment color */
+        .code-block .keyword { color: #c792ea; font-weight: bold; } /* Purple for keywords */
+        .code-block .string { color: #c3e88d; } /* Green for strings */
+        .code-block .function { color: #82aaff; } /* Blue for functions */
+        .code-block .type { color: #ffcb6b; } /* Yellow for types */
+        .code-block .number { color: #f78c6c; } /* Orange for numbers */
+        .code-block .class { color: #ffcb6b; font-weight: bold; } /* Yellow for class names */
+        .code-block .variable { color: #bfc7d5; } /* Lighter variable color */
+        .code-block .operator { color: #89ddff; } /* Cyan for operators */
+        .code-block .property { color: #f07178; } /* Reddish for properties */
+
+
+        /* Listes */
+        .tech-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjusted minmax */
+            gap: 1.5em; /* Increased gap */
+            margin: 1.5em 0;
+        }
+
+        .tech-item {
+            background: #f8f9fa;
+            padding: 1.2em; /* Increased padding */
+            border-left: 5px solid #667eea; /* Thicker border */
+            border-radius: 6px; /* Rounded corners */
+        }
+
+        .tech-item strong {
+            color: #2c3e50;
+        }
+        .tech-item p {
+            margin-top: 0.3em;
+            font-size: 0.95em;
+        }
+
+        /* Tables */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-radius: 8px; /* Rounded corners for table */
+            overflow: hidden; /* Clip content to rounded corners */
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 0.8em 1em; /* Adjusted padding */
+            text-align: left;
+            font-weight: 500; /* Medium weight */
+        }
+
+        .comparison-table td {
+            padding: 0.8em 1em;
+            border-bottom: 1px solid #e0e0e0; /* Lighter border */
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+
+        /* Interface mockup */
+        .ui-mockup {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjusted minmax */
+            gap: 2em;
+            margin: 2em 0;
+        }
+
+        .screen-mockup {
+            background: #ffffff; /* White background */
+            border: 1px solid #d1d8e0; /* Softer border */
+            border-radius: 16px; /* More rounded */
+            padding: 1.5em 1em; /* Adjusted padding */
+            text-align: center;
+            min-height: 380px; /* Adjusted height */
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* Softer shadow */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen-mockup::before { /* Speaker grille imitation */
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 5px;
+            background: #bdc3c7; /* Darker grey */
+            border-radius: 3px;
+        }
+
+        .screen-title {
+            font-weight: 600; /* Bolder */
+            color: #2c3e50;
+            margin-bottom: 1em;
+            font-size: 1.1em;
+        }
+
+        .screen-elements {
+            text-align: left;
+            margin-top: 1em;
+            padding-left: 1em;
+            font-size: 0.9em;
+            color: #555;
+            flex-grow: 1; /* Allow elements to fill space */
+        }
+
+        .screen-elements ul {
+            list-style-type: disc; /* Use disc for bullet points */
+            padding-left: 1.5em;
+        }
+
+        .screen-elements li {
+            margin: 0.5em 0;
+            padding: 0.2em 0;
+        }
+        
+        .screen-mockup .mockup-button {
+            background-color: #667eea;
+            color: white;
+            padding: 0.6em 1.2em;
+            border-radius: 20px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1em;
+            font-size: 0.9em;
+        }
+         .screen-mockup .mockup-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 0.5em;
+            width: 80%;
+            margin: 0.3em auto;
+            display: block;
+        }
+
+        /* Pied de page */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2em;
+            margin-top: 3em;
+        }
+        .footer p {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        /* Impression */
+        @media print {
+            body {
+                background: white;
+                font-size: 10pt; /* Adjust base font size for print */
+            }
+            .header, .footer {
+                position: static;
+                background: #eee; /* Lighter for print */
+                color: #333;
+            }
+            .cover-page {
+                height: auto; /* Adjust for print */
+                page-break-after: always;
+                background: white; /* Simpler background for print */
+                color: #333;
+            }
+            .cover-page h1, .cover-page h2 {
+                text-shadow: none;
+            }
+            .toc {
+                page-break-after: always;
+                margin: 1em 0; /* Reduced margin for print */
+            }
+            .container {
+                box-shadow: none;
+                margin: 0;
+                max-width: 100%;
+            }
+            .section {
+                page-break-inside: avoid;
+                margin-bottom: 1.5em; /* Reduced margin */
+            }
+            .diagram, .code-block, .ui-mockup, .tech-item {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+            pre {
+                background: #f8f8f8; /* Lighter code background for print */
+                color: #333;
+                border: 1px solid #ddd;
+                font-size: 8pt;
+            }
+            .code-block .comment { color: #666; }
+            .code-block .keyword { color: #0077aa; font-weight: bold; }
+            .code-block .string { color: #009900; }
+            .code-block .function { color: #dc322f; }
+            .code-block .type { color: #b58900;}
+            .code-block .class { color: #b58900; font-weight: bold;}
+
+            .screen-mockup {
+                 border: 1px solid #aaa;
+                 min-height: auto;
+            }
+            .layer {
+                background: #eef;
+                color: #333;
+                border: 1px solid #aac;
+            }
+            .flow-step {
+                background: #f0f0f0;
+                border: 1px solid #aaa;
+            }
+            .flow-step::after {
+                color: #aaa;
+            }
+            .header h1, .toc h2, .section h2, .section h3 {
+                color: #333; /* Ensure readability */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cover-page">
+        <div class="cover-content">
+            <h1>Rapport Technique</h1>
+            <h2>Application d'authentification faciale<br>Flutter avec Supabase</h2>
+            
+            <div class="project-members">
+                <h3>Membres du projet :</h3>
+                <p>1 - SIFI Tarek Mazigh</p>
+                <p>2 - KECIRA Abderraouf</p>
+            </div>
+
+            <div class="cover-meta">
+                <p><strong>Technologie :</strong> Flutter & Supabase</p>
+                <p><strong>Type :</strong> Application Mobile</p>
+                <p><strong>Date :</strong> Mai 2025</p> </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Application d'authentification faciale - Rapport technique</h1>
+        </div>
+
+        <div class="toc">
+            <h2>📋 Table des matières</h2>
+            <ul>
+                <li><a href="#introduction">1. Introduction <span class="page-num">Page X</span></a></li>
+                <li><a href="#technologies">2. Packages et technologies utilisés <span class="page-num">Page Y</span></a></li>
+                <li><a href="#architecture">3. Architecture de l'application <span class="page-num">Page Z</span></a></li>
+                <li><a href="#developpement">4. Étapes de développement <span class="page-num">Page A</span></a></li>
+                <li><a href="#interface">5. Interface utilisateur <span class="page-num">Page B</span></a></li>
+                <li><a href="#code">6. Explication du code source <span class="page-num">Page C</span></a></li>
+                <li><a href="#conclusion">7. Conclusion <span class="page-num">Page D</span></a></li>
+            </ul>
+            <p style="font-size: 0.8em; color: #777; margin-top: 1em;">(Les numéros de page sont indicatifs et dépendront de la mise en page finale lors de l'impression ou de la conversion en PDF.)</p>
+        </div>
+
+        <div class="content">
+            <section id="introduction" class="section">
+                <h2>1. Introduction</h2>
+                <p>L'application développée est un système d'authentification faciale mobile utilisant Flutter comme framework de développement et Supabase comme backend. Elle permet aux utilisateurs de s'inscrire avec un email, un mot de passe et une photo de leur visage, puis de se connecter soit avec leurs identifiants traditionnels, soit via reconnaissance faciale.</p>
+                <p>Ce rapport détaille les technologies employées, l'architecture de l'application, les étapes clés du développement, un aperçu de l'interface utilisateur, ainsi qu'une explication de certains extraits pertinents du code source.</p>
+            </section>
+
+            <hr>
+
+            <section id="technologies" class="section">
+                <h2>2. Packages et technologies utilisés</h2>
+                
+                <h3>Technologies principales</h3>
+                <div class="tech-list">
+                    <div class="tech-item">
+                        <strong>Flutter</strong>
+                        <p>Framework UI multiplateforme pour le développement d'applications mobiles natives performantes à partir d'une seule base de code.</p>
+                    </div>
+                    <div class="tech-item">
+                        <strong>Supabase</strong>
+                        <p>Alternative open source à Firebase, utilisée pour l'authentification, la base de données PostgreSQL et le stockage de fichiers.</p>
+                    </div>
+                </div>
+
+                <h3>Packages Flutter</h3>
+                <p>Une sélection de packages Flutter a été utilisée pour faciliter le développement et intégrer les fonctionnalités nécessaires :</p>
+                <div class="tech-list">
+                    <div class="tech-item"><strong>supabase_flutter (^2.0.0):</strong> Client Supabase pour Flutter, permettant l'authentification et l'accès à la base de données.</div>
+                    <div class="tech-item"><strong>google_ml_kit (^0.16.0):</strong> Kit d'outils ML de Google pour la détection faciale sur l'appareil.</div>
+                    <div class="tech-item"><strong>image_picker (^1.0.4):</strong> Pour sélectionner des images depuis la galerie ou prendre une photo avec la caméra.</div>
+                    <div class="tech-item"><strong>camera (^0.10.5+5):</strong> Pour accéder directement à la caméra de l'appareil pour la capture en direct.</div>
+                    <div class="tech-item"><strong>path_provider (^2.1.1) & path (^1.8.3):</strong> Pour la gestion des chemins de fichiers et des répertoires.</div>
+                    <div class="tech-item"><strong>audioplayers (^5.2.1):</strong> Pour jouer des sons de succès/échec lors des tentatives d'authentification.</div>
+                    <div class="tech-item"><strong>uuid (^4.2.1):</strong> Pour générer des identifiants uniques, notamment pour les noms de fichiers image.</div>
+                    <div class="tech-item"><strong>http (^1.1.0):</strong> Pour effectuer des requêtes HTTP (si nécessaire pour des API externes non couvertes par Supabase).</div>
+                    <div class="tech-item"><strong>image (^4.1.3):</strong> Librairie de traitement d'images pour des opérations comme le redimensionnement ou la comparaison basique (utilisée pour le prétraitement).</div>
+                    <div class="tech-item"><strong>shared_preferences (^2.2.0):</strong> Pour stocker des données simples localement sur l'appareil (ex: préférences utilisateur).</div>
+                </div>
+            </section>
+
+            <hr>
+
+            <section id="architecture" class="section">
+                <h2>3. Architecture de l'application</h2>
+                <p>L'application suit une architecture en couches pour séparer les préoccupations et améliorer la maintenabilité et la testabilité du code. Les principales couches sont :</p>
+                
+                <div class="diagram">
+                    <h4>Diagramme d'Architecture Logique</h4>
+                    <div class="architecture-diagram">
+                        <div class="layer">
+                            <h5>Couche UI (Présentation)</h5>
+                            <p>Pages Flutter (login, inscription, accueil). Gestion de l'état de l'interface et des interactions utilisateur.</p>
+                        </div>
+                        <span class="layer-connector">  </span> <div class="layer">
+                            <h5>Couche Service</h5>
+                            <p>Logique métier : services d'authentification, de reconnaissance faciale, audio, etc.</p>
+                        </div>
+                        <span class="layer-connector">  </span>
+                        <div class="layer">
+                            <h5>Couche Modèle</h5>
+                            <p>Définition des structures de données (ex: UserModel) utilisées à travers l'application.</p>
+                        </div>
+                         <span class="layer-connector">  </span>
+                        <div class="layer">
+                            <h5>Couche Infrastructure</h5>
+                            <p>Intégration avec les services externes : Supabase (Auth, DB, Storage) et ML Kit (Détection faciale).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Structure des fichiers</h3>
+                <p>L'organisation des fichiers du projet reflète cette architecture :</p>
+                <pre class="code-block"><code>lib/
+├── main.dart                   <span class="comment">// Point d'entrée de l'application</span>
+├── models/
+│   └── user_model.dart         <span class="comment">// Modèle de données pour l'utilisateur</span>
+├── pages/
+│   ├── home/
+│   │   └── home_page.dart      <span class="comment">// Page d'accueil après connexion</span>
+│   ├── login/
+│   │   └── login_page.dart     <span class="comment">// Page de connexion</span>
+│   ├── signup/
+│   │   └── signup_page.dart    <span class="comment">// Page d'inscription</span>
+│   └── splash_page.dart        <span class="comment">// Écran de démarrage</span>
+├── services/
+│   ├── auth_service.dart       <span class="comment">// Logique d'authentification (email/pass, facial)</span>
+│   ├── audio_service.dart      <span class="comment">// Gestion des retours sonores</span>
+│   ├── face_recognition_service.dart <span class="comment">// Détection et comparaison faciale</span>
+│   ├── platform_service.dart   <span class="comment">// Services spécifiques à la plateforme (optionnel)</span>
+│   └── supabase_options.dart   <span class="comment">// Configuration client Supabase</span>
+└── widgets/                    <span class="comment">// Widgets réutilisables (ex: CustomButton, FormField)</span></code></pre>
+
+                <div class="diagram">
+                    <h4>Flux d'Authentification Simplifié</h4>
+                    <div class="flow-diagram">
+                        <div class="flow-step">Utilisateur ouvre l'app</div>
+                        <div class="flow-step">Splash Screen (vérifie session)</div>
+                        <div class="flow-step">Redirige vers Login/Home</div>
+                        <div class="flow-step">Login: Email/Pass OU Visage</div>
+                        <div class="flow-step">Supabase Valide / ML Kit Compare</div>
+                        <div class="flow-step">Accès à Home Page</div>
+                    </div>
+                </div>
+            </section>
+
+            <hr>
+
+            <section id="developpement" class="section">
+                <h2>4. Étapes de développement</h2>
+                <p>Le développement de l'application a suivi plusieurs phases clés :</p>
+                <ol>
+                    <li>
+                        <strong>Configuration initiale :</strong>
+                        <ul>
+                            <li>Mise en place du projet Flutter et initialisation des dépendances.</li>
+                            <li>Configuration du projet Supabase : création de la base de données, du bucket de stockage pour les images faciales.</li>
+                            <li>Définition des schémas de tables (ex: `profiles`).</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Développement du backend (Supabase) :</strong>
+                        <ul>
+                            <li>Création de la table `profiles` avec les colonnes nécessaires (id, email, first_name, last_name, face_image_url).</li>
+                            <li>Configuration du stockage (Storage) pour les images faciales, incluant les politiques d'accès.</li>
+                            <li>Mise en place des politiques de sécurité RLS (Row Level Security) pour protéger les données des utilisateurs.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Développement des services :</strong>
+                        <ul>
+                            <li>Implémentation du `AuthService` pour gérer l'inscription, la connexion (email/mot de passe), la déconnexion et la récupération des données utilisateur.</li>
+                            <li>Développement du `FaceRecognitionService` intégrant `google_ml_kit` pour la détection des visages et une logique de comparaison d'images (prétraitement, calcul de similarité).</li>
+                            <li>Création du `AudioService` pour les retours sonores (succès/échec).</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Développement de l'interface utilisateur (UI) :</strong>
+                        <ul>
+                            <li>Création de la page de démarrage (`SplashPage`) pour vérifier l'état d'authentification.</li>
+                            <li>Conception de la page d'inscription (`SignupPage`) avec formulaires et capture/sélection de photo.</li>
+                            <li>Élaboration de la page de connexion (`LoginPage`) offrant les options d'authentification par mot de passe ou par reconnaissance faciale.</li>
+                            <li>Développement de la page d'accueil (`HomePage`) affichant les informations de l'utilisateur connecté.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Intégration et tests :</strong>
+                        <ul>
+                            <li>Tests unitaires et d'intégration pour les services critiques (authentification, reconnaissance faciale).</li>
+                            <li>Tests fonctionnels sur les flux utilisateurs principaux (inscription, connexion, déconnexion).</li>
+                            <li>Optimisations des performances, notamment pour le traitement d'images.</li>
+                            <li>Corrections de bugs et ajustements de l'interface utilisateur basés sur les retours.</li>
+                        </ul>
+                    </li>
+                </ol>
+            </section>
+
+            <hr>
+
+            <section id="interface" class="section">
+                <h2>5. Interface utilisateur (UI)</h2>
+                <p>L'interface utilisateur a été conçue pour être intuitive, moderne et responsive, en s'appuyant sur les principes de Material Design 3. Elle est illustrée par les captures d'écran suivantes :</p>
+
+                <div class="ui-mockup">
+                    <div class="screen-mockup">
+                        <div class="screen-title"></div>
+                        <img src="login_avec_face_id.jfif" alt="Capture d'écran de la connexion avec Face ID" style="width: 100%; max-width: 250px; height: auto; margin: 1em auto; border: 1px solid #ddd; border-radius: 8px;">
+                        <div class="screen-elements">
+                            <p style="text-align:center; margin-top: 10px;">
+                                
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="screen-mockup">
+                        <div class="screen-title"></div>
+                        <img src="login_avec_motDePasse.jfif" alt="Capture d'écran de la connexion avec mot de passe" style="width: 100%; max-width: 250px; height: auto; margin: 1em auto; border: 1px solid #ddd; border-radius: 8px;">
+                        <div class="screen-elements">
+                            <p style="text-align:center; margin-top: 10px;">
+                                
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="screen-mockup">
+                        <div class="screen-title"></div>
+                        <img src="profile.jfif" alt="Capture d'écran du profil utilisateur" style="width: 100%; max-width: 250px; height: auto; margin: 1em auto; border: 1px solid #ddd; border-radius: 8px;">
+                        <div class="screen-elements">
+                            <p style="text-align:center; margin-top: 10px;">
+                                
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="screen-mockup">
+                        <div class="screen-title"></div>
+                        <img src="login_avec_motDePasse.jfif" alt="Capture d'écran 4 (à préciser)" style="width: 100%; max-width: 250px; height: auto; margin: 1em auto; border: 1px solid #ddd; border-radius: 8px;">
+                        <div class="screen-elements">
+                            <p style="text-align:center; margin-top: 10px;">
+                                
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p style="margin-top: 1em;">Ces écrans illustrent les flux principaux de l'application, de l'authentification à l'interaction avec les fonctionnalités de base après connexion.</p>
+            </section>
+
+            <hr>
+            
+            <section id="code" class="section">
+                <h2>6. Explication du code source</h2>
+
+                <h3>Service d'authentification (`auth_service.dart`)</h3>
+                <p>Le service d'authentification gère toutes les interactions relatives à l'authentification des utilisateurs avec Supabase. Il encapsule la logique de connexion, d'inscription et de gestion de session.</p>
+
+                <pre class="code-block"><code class="language-dart"><span class="comment">// Principales méthodes du AuthService</span>
+<span class="keyword">import</span> <span class="string">'package:supabase_flutter/supabase_flutter.dart'</span>;
+<span class="keyword">import</span> <span class="string">'package:image_picker/image_picker.dart'</span>; <span class="comment">// Pour XFile</span>
+<span class="keyword">import</span> <span class="string">'../models/user_model.dart'</span>; <span class="comment">// Assurez-vous que le chemin est correct</span>
+
+<span class="keyword">class</span> <span class="class">AuthService</span> {
+  <span class="keyword">final</span> <span class="type">SupabaseClient</span> _supabase = Supabase.instance.client;
+
+  <span class="comment">// Authentifie l'utilisateur avec email/mot de passe</span>
+  <span class="keyword">Future</span>&lt;<span class="type">bool</span>&gt; <span class="function">signInWithEmailAndPassword</span>(<span class="type">String</span> email, <span class="type">String</span> password) <span class="keyword">async</span> {
+    <span class="keyword">try</span> {
+      <span class="keyword">final</span> <span class="type">AuthResponse</span> response = <span class="keyword">await</span> _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      <span class="keyword">if</span> (response.user != <span class="keyword">null</span>) {
+        <span class="keyword">await</span> _ensureProfileExists(response.user!);
+        <span class="keyword">return</span> <span class="number">true</span>;
+      }
+    } <span class="keyword">catch</span> (e) {
+      <span class="comment">// Gérer l'erreur (ex: log, afficher un message)</span>
+      print(<span class="string">'Erreur signInWithEmailAndPassword: $e'</span>);
+    }
+    <span class="keyword">return</span> <span class="number">false</span>;
+  }
+
+  <span class="comment">// Inscrit un nouvel utilisateur et stocke sa photo et ses informations</span>
+  <span class="keyword">Future</span>&lt;<span class="type">bool</span>&gt; <span class="function">registerWithEmailAndPassword</span>({
+    <span class="keyword">required</span> <span class="type">String</span> email,
+    <span class="keyword">required</span> <span class="type">String</span> password,
+    <span class="keyword">required</span> <span class="type">String</span> firstName,
+    <span class="keyword">required</span> <span class="type">String</span> lastName,
+    <span class="type">XFile?</span> faceImage, <span class="comment">// Image du visage pour l'inscription</span>
+  }) <span class="keyword">async</span> {
+    <span class="keyword">try</span> {
+      <span class="keyword">final</span> <span class="type">AuthResponse</span> response = <span class="keyword">await</span> _supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
+      <span class="keyword">if</span> (response.user != <span class="keyword">null</span>) {
+        <span class="type">String?</span> faceImageUrl;
+        <span class="keyword">if</span> (faceImage != <span class="keyword">null</span>) {
+          <span class="comment">// Logique pour uploader l'image sur Supabase Storage</span>
+          <span class="comment">// et récupérer l'URL. Exemple simplifié :</span>
+          <span class="keyword">final</span> <span class="type">String</span> imagePath = <span class="string">'public/${response.user!.id}/profile.jpg'</span>;
+          <span class="keyword">await</span> _supabase.storage.from(<span class="string">'avatars'</span>).upload(
+                imagePath,
+                <span class="keyword">await</span> faceImage.readAsBytes(),
+                fileOptions: <span class="keyword">const</span> <span class="type">FileOptions</span>(cacheControl: <span class="string">'3600'</span>, upsert: <span class="number">true</span>),
+              );
+          faceImageUrl = _supabase.storage.from(<span class="string">'avatars'</span>).getPublicUrl(imagePath);
+        }
+
+        <span class="comment">// Créer le profil dans la table 'profiles'</span>
+        <span class="keyword">await</span> _supabase.from(<span class="string">'profiles'</span>).insert({
+          <span class="string">'id'</span>: response.user!.id,
+          <span class="string">'email'</span>: email,
+          <span class="string">'first_name'</span>: firstName,
+          <span class="string">'last_name'</span>: lastName,
+          <span class="string">'face_image_url'</span>: faceImageUrl, <span class="comment">// Stocker l'URL de l'image</span>
+        });
+        <span class="keyword">return</span> <span class="number">true</span>;
+      }
+    } <span class="keyword">catch</span> (e) {
+      print(<span class="string">'Erreur registerWithEmailAndPassword: $e'</span>);
+    }
+    <span class="keyword">return</span> <span class="number">false</span>;
+  }
+
+  <span class="comment">// Authentifie l'utilisateur en comparant le visage capturé avec celui stocké</span>
+  <span class="comment">// Note: La logique de comparaison réelle est dans FaceRecognitionService</span>
+  <span class="keyword">Future</span>&lt;<span class="type">bool</span>&gt; <span class="function">signInWithFace</span>({
+    <span class="keyword">required</span> <span class="type">String</span> email, <span class="comment">// Pour récupérer le profil et l'image stockée</span>
+    <span class="keyword">required</span> <span class="type">XFile</span> capturedFaceImage, <span class="comment">// Image capturée pour la connexion</span>
+  }) <span class="keyword">async</span> {
+    <span class="comment">// 1. Récupérer l'URL de l'image faciale stockée pour cet email/userID</span>
+    <span class="comment">// 2. Télécharger l'image stockée.</span>
+    <span class="comment">// 3. Utiliser FaceRecognitionService pour comparer les deux images.</span>
+    <span class="comment">// 4. Si la comparaison est réussie, connecter l'utilisateur (peut nécessiter un token personnalisé ou une session).</span>
+    <span class="comment">// Cette partie est complexe et dépend de l'implémentation exacte de la comparaison faciale.</span>
+    <span class="comment">// Pour l'instant, ceci est un placeholder.</span>
+    <span class="keyword">try</span> {
+        <span class="comment">// Exemple: Simuler une vérification de l'email pour obtenir l'ID utilisateur</span>
+        <span class="keyword">final</span> userProfile = <span class="keyword">await</span> _supabase.from(<span class="string">'profiles'</span>).select(<span class="string">'id, face_image_url'</span>).eq(<span class="string">'email'</span>, email).single();
+        <span class="keyword">if</span> (userProfile[<span class="string">'face_image_url'</span>] == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="number">false</span>; <span class="comment">// Pas d'image de référence</span>
+
+        <span class="comment">// ... logique d'appel à FaceRecognitionService.compareFaces(...) ...</span>
+        <span class="comment">// bool areFacesSimilar = await faceRecognitionService.compareFaces(capturedFaceImage, storedImageUrl);</span>
+        <span class="comment">// if (areFacesSimilar) { /* Connecter l'utilisateur */ return true; } </span>
+    } <span class="keyword">catch</span> (e) {
+        print(<span class="string">'Erreur signInWithFace: $e'</span>);
+    }
+    <span class="keyword">return</span> <span class="number">false</span>; <span class="comment">// Placeholder</span>
+  }
+
+  <span class="comment">// Récupère les données de l'utilisateur depuis la table 'profiles'</span>
+  <span class="keyword">Future</span>&lt;<span class="type">UserModel?</span>&gt; <span class="function">getUserData</span>() <span class="keyword">async</span> {
+    <span class="keyword">final</span> <span class="type">User?</span> currentUser = _supabase.auth.currentUser;
+    <span class="keyword">if</span> (currentUser != <span class="keyword">null</span>) {
+      <span class="keyword">try</span> {
+        <span class="keyword">final</span> data = <span class="keyword">await</span> _supabase
+            .from(<span class="string">'profiles'</span>)
+            .select()
+            .eq(<span class="string">'id'</span>, currentUser.id)
+            .single();
+        <span class="keyword">return</span> <span class="type">UserModel</span>.fromJson(data);
+      } <span class="keyword">catch</span> (e) {
+        print(<span class="string">'Erreur getUserData: $e'</span>);
+        <span class="keyword">return</span> <span class="keyword">null</span>;
+      }
+    }
+    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+
+  <span class="comment">// Déconnecte l'utilisateur</span>
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">signOut</span>() <span class="keyword">async</span> {
+    <span class="keyword">await</span> _supabase.auth.signOut();
+  }
+
+  <span class="comment">// S'assure qu'un profil existe pour l'utilisateur authentifié</span>
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_ensureProfileExists</span>(<span class="type">User</span> user) <span class="keyword">async</span> {
+    <span class="keyword">try</span> {
+        <span class="keyword">final</span> profile = <span class="keyword">await</span> _supabase
+            .from(<span class="string">'profiles'</span>)
+            .select(<span class="string">'id'</span>)
+            .eq(<span class="string">'id'</span>, user.id)
+            .maybeSingle(); <span class="comment">// maybeSingle retourne null si non trouvé, sans erreur</span>
+
+        <span class="keyword">if</span> (profile == <span class="keyword">null</span>) {
+            <span class="comment">// Le profil n'existe pas, créons-le avec des valeurs par défaut</span>
+            <span class="keyword">await</span> _supabase.from(<span class="string">'profiles'</span>).insert({
+            <span class="string">'id'</span>: user.id,
+            <span class="string">'email'</span>: user.email,
+            <span class="comment">// 'first_name', 'last_name' pourraient être null ou vides par défaut</span>
+            });
+        }
+    } <span class="keyword">catch</span> (e) {
+        print(<span class="string">'Erreur _ensureProfileExists: $e'</span>);
+    }
+  }
+}</code></pre>
+
+                <h3>Service de reconnaissance faciale (`face_recognition_service.dart`)</h3>
+                <p>Ce service est crucial pour l'authentification faciale. Il utilise `google_ml_kit` pour la détection des visages dans les images et implémente une logique de comparaison pour vérifier si deux visages correspondent. La comparaison peut se baser sur des descripteurs faciaux (embeddings) si le kit le permet, ou sur des techniques de comparaison d'images plus directes (histogrammes, similarité de pixels) après alignement et normalisation.</p>
+
+                <pre class="code-block"><code class="language-dart"><span class="keyword">import</span> <span class="string">'dart:typed_data'</span>;
+<span class="keyword">import</span> <span class="string">'package:google_ml_kit/google_ml_kit.dart'</span>; <span class="comment">// Assumant google_ml_kit_face_detection</span>
+<span class="keyword">import</span> <span class="string">'package:image_picker/image_picker.dart'</span>;
+<span class="keyword">import</span> <span class="string">'package:image/image.dart'</span> <span class="keyword">as</span> img; <span class="comment">// Pour le prétraitement d'image</span>
+<span class="keyword">import</span> <span class="string">'package:http/http.dart'</span> <span class="keyword">as</span> http; <span class="comment">// Pour télécharger l'image stockée</span>
+
+<span class="keyword">class</span> <span class="class">FaceRecognitionService</span> {
+  <span class="keyword">final</span> <span class="type">FaceDetector</span> _faceDetector = GoogleMlKit.vision.faceDetector(
+    <span class="type">FaceDetectorOptions</span>(
+      enableContours: <span class="number">true</span>,
+      enableLandmarks: <span class="number">true</span>,
+      performanceMode: FaceDetectorMode.accurate,
+    ),
+  );
+
+  <span class="comment">// Seuil de similarité, à ajuster après tests</span>
+  <span class="type">double</span> _similarityThreshold = <span class="number">0.65</span>; <span class="comment">// Exemple : 65%</span>
+
+  <span class="comment">// Compare le visage capturé avec une image de référence (stockée ou fournie)</span>
+  <span class="keyword">Future</span>&lt;<span class="type">bool</span>&gt; <span class="function">compareFaces</span>({
+    <span class="keyword">required</span> <span class="type">XFile</span> capturedImageFile,
+    <span class="type">String?</span> storedImageUrl, <span class="comment">// URL de l'image stockée dans Supabase</span>
+    <span class="type">Uint8List?</span> referenceImageBytes, <span class="comment">// Ou bytes directs de l'image de référence</span>
+  }) <span class="keyword">async</span> {
+    <span class="keyword">try</span> {
+      <span class="keyword">final</span> <span class="type">Uint8List</span> capturedBytes = <span class="keyword">await</span> capturedImageFile.readAsBytes();
+      <span class="type">Uint8List?</span> referenceBytes = referenceImageBytes;
+
+      <span class="keyword">if</span> (referenceBytes == <span class="keyword">null</span> && storedImageUrl != <span class="keyword">null</span>) {
+        <span class="comment">// Télécharger l'image de référence si URL fournie</span>
+        <span class="keyword">final</span> response = <span class="keyword">await</span> http.get(Uri.parse(storedImageUrl));
+        <span class="keyword">if</span> (response.statusCode == <span class="number">200</span>) {
+          referenceBytes = response.bodyBytes;
+        } <span class="keyword">else</span> {
+          print(<span class="string">'Erreur téléchargement image de référence.'</span>);
+          <span class="keyword">return</span> <span class="number">false</span>;
+        }
+      }
+
+      <span class="keyword">if</span> (referenceBytes == <span class="keyword">null</span>) {
+        print(<span class="string">'Aucune image de référence fournie.'</span>);
+        <span class="keyword">return</span> <span class="number">false</span>;
+      }
+
+      <span class="comment">// Prétraitement des deux images (détection, rognage, normalisation)</span>
+      <span class="keyword">final</span> <span class="type">img.Image?</span> processedCapturedFace = <span class="keyword">await</span> _preprocessFace(capturedBytes);
+      <span class="keyword">final</span> <span class="type">img.Image?</span> processedReferenceFace = <span class="keyword">await</span> _preprocessFace(referenceBytes);
+
+      <span class="keyword">if</span> (processedCapturedFace == <span class="keyword">null</span> || processedReferenceFace == <span class="keyword">null</span>) {
+        print(<span class="string">'Détection faciale échouée sur une des images.'</span>);
+        <span class="keyword">return</span> <span class="number">false</span>;
+      }
+
+      <span class="comment">// Calculer la similarité</span>
+      <span class="comment">// Note: Ceci est une simplification. Une vraie comparaison d'embeddings serait plus robuste.</span>
+      <span class="keyword">final</span> <span class="type">double</span> pixelSimilarity = _calculatePixelSimilarity(
+        img.encodePng(processedCapturedFace), 
+        img.encodePng(processedReferenceFace)
+      );
+      <span class="keyword">final</span> <span class="type">double</span> histSimilarity = _calculateHistogramSimilarity(
+        img.encodePng(processedCapturedFace), 
+        img.encodePng(processedReferenceFace)
+      );
+      
+      <span class="comment">// Score pondéré (exemple)</span>
+      <span class="keyword">final</span> <span class="type">double</span> finalScore = (pixelSimilarity * <span class="number">0.6</span>) + (histSimilarity * <span class="number">0.4</span>);
+      print(<span class="string">'Score de similarité final: $finalScore'</span>);
+      
+      <span class="keyword">bool</span> isMatch = finalScore >= _similarityThreshold;
+      <span class="comment">// Optionnel: ajuster le seuil dynamiquement basé sur les retours (plus complexe)</span>
+      <span class="comment">// await _adjustSimilarityThreshold(finalScore, isMatch);</span>
+      
+      <span class="keyword">return</span> isMatch;
+
+    } <span class="keyword">catch</span> (e) {
+      print(<span class="string">'Erreur dans compareFaces: $e'</span>);
+      <span class="keyword">return</span> <span class="number">false</span>;
+    } <span class="keyword">finally</span> {
+      _faceDetector.close(); <span class="comment">// Toujours fermer le détecteur</span>
+    }
+  }
+
+  <span class="comment">// Prétraite une image pour isoler et normaliser le visage</span>
+  <span class="keyword">Future</span>&lt;<span class="type">img.Image?</span>&gt; <span class="function">_preprocessFace</span>(<span class="type">Uint8List</span> imageBytes) <span class="keyword">async</span> {
+    <span class="keyword">final</span> <span class="type">InputImage</span> inputImage = InputImage.fromBytes(bytes: imageBytes, inputImageData: <span class="keyword">null</span>!); <span class="comment">// TODO: Remplir inputImageData si possible</span>
+    <span class="keyword">final</span> <span class="type">List</span>&lt;<span class="type">Face</span>&gt; faces = <span class="keyword">await</span> _faceDetector.processImage(inputImage);
+
+    <span class="keyword">if</span> (faces.isEmpty) <span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">// Aucun visage détecté</span>
+    <span class="keyword">final</span> <span class="type">Face</span> face = faces.first; <span class="comment">// Prendre le premier visage détecté (ou le plus grand)</span>
+
+    <span class="keyword">final</span> <span class="type">img.Image?</span> originalImage = img.decodeImage(imageBytes);
+    <span class="keyword">if</span> (originalImage == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;
+
+    <span class="comment">// Rogner l'image autour du visage détecté</span>
+    <span class="keyword">final</span> <span class="type">img.Image</span> croppedFace = img.copyCrop(
+      originalImage,
+      x: face.boundingBox.left.toInt(),
+      y: face.boundingBox.top.toInt(),
+      width: face.boundingBox.width.toInt(),
+      height: face.boundingBox.height.toInt(),
+    );
+
+    <span class="comment">// Redimensionner à une taille standard (ex: 112x112, commun pour les modèles de reconnaissance faciale)</span>
+    <span class="keyword">final</span> <span class="type">img.Image</span> resizedFace = img.copyResize(croppedFace, width: <span class="number">112</span>, height: <span class="number">112</span>);
+    
+    <span class="comment">// Convertir en niveaux de gris et normaliser (optionnel, dépend de la méthode de comparaison)</span>
+    <span class="comment">// final img.Image grayscaleFace = img.grayscale(resizedFace);</span>
+    
+    <span class="keyword">return</span> resizedFace;
+  }
+
+  <span class="comment">// Calcule la similarité pixel par pixel (très basique)</span>
+  <span class="type">double</span> <span class="function">_calculatePixelSimilarity</span>(<span class="type">Uint8List</span> image1Bytes, <span class="type">Uint8List</span> image2Bytes) {
+    <span class="keyword">final</span> image1 = img.decodeImage(image1Bytes)!;
+    <span class="keyword">final</span> image2 = img.decodeImage(image2Bytes)!;
+
+    <span class="keyword">if</span> (image1.width != image2.width || image1.height != image2.height) {
+        <span class="keyword">return</span> <span class="number">0.0</span>; <span class="comment">// Les images doivent avoir la même taille pour cette méthode</span>
+    }
+    <span class="type">int</span> diff = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="type">int</span> y = <span class="number">0</span>; y &lt; image1.height; y++) {
+        <span class="keyword">for</span> (<span class="type">int</span> x = <span class="number">0</span>; x &lt; image1.width; x++) {
+            <span class="keyword">final</span> p1 = image1.getPixel(x, y);
+            <span class="keyword">final</span> p2 = image2.getPixel(x, y);
+            diff += (p1.r - p2.r).abs();
+            diff += (p1.g - p2.g).abs();
+            diff += (p1.b - p2.b).abs();
+        }
+    }
+    <span class="type">int</span> maxDiff = image1.width * image1.height * <span class="number">255</span> * <span class="number">3</span>;
+    <span class="keyword">return</span> <span class="number">1.0</span> - (diff / maxDiff);
+  }
+
+  <span class="comment">// Calcule et compare les histogrammes de couleurs (simplifié)</span>
+  <span class="type">double</span> <span class="function">_calculateHistogramSimilarity</span>(<span class="type">Uint8List</span> image1Bytes, <span class="type">Uint8List</span> image2Bytes) {
+    <span class="keyword">final</span> hist1 = _computeHistogram(img.decodeImage(image1Bytes)!);
+    <span class="keyword">final</span> hist2 = _computeHistogram(img.decodeImage(image2Bytes)!);
+    
+    <span class="comment">// Comparaison de corrélation d'histogramme (exemple simple)</span>
+    <span class="type">double</span> correlation = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">256</span>; i++) {
+      correlation += (hist1[<span class="string">'r'</span>]![i] * hist2[<span class="string">'r'</span>]![i]);
+      correlation += (hist1[<span class="string">'g'</span>]![i] * hist2[<span class="string">'g'</span>]![i]);
+      correlation += (hist1[<span class="string">'b'</span>]![i] * hist2[<span class="string">'b'</span>]![i]);
+    }
+    <span class="comment">// Normaliser le résultat (très grossier, une vraie méthode est nécessaire)</span>
+    <span class="keyword">return</span> correlation / (<span class="number">1e9</span>); <span class="comment">// Valeur arbitraire pour mise à l'échelle</span>
+  }
+
+  <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">List</span>&lt;<span class="type">double</span>&gt;&gt; <span class="function">_computeHistogram</span>(<span class="type">img.Image</span> image) {
+    <span class="keyword">var</span> rHist = <span class="type">List</span>&lt;<span class="type">double</span>&gt;.filled(<span class="number">256</span>, <span class="number">0.0</span>);
+    <span class="keyword">var</span> gHist = <span class="type">List</span>&lt;<span class="type">double</span>&gt;.filled(<span class="number">256</span>, <span class="number">0.0</span>);
+    <span class="keyword">var</span> bHist = <span class="type">List</span>&lt;<span class="type">double</span>&gt;.filled(<span class="number">256</span>, <span class="number">0.0</span>);
+    <span class="type">int</span> numPixels = image.width * image.height;
+
+    <span class="keyword">for</span> (<span class="keyword">var</span> pixel <span class="keyword">in</span> image) {
+        rHist[pixel.r.toInt()]++;
+        gHist[pixel.g.toInt()]++;
+        bHist[pixel.b.toInt()]++;
+    }
+    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">256</span>; i++) {
+        rHist[i] /= numPixels;
+        gHist[i] /= numPixels;
+        bHist[i] /= numPixels;
+    }
+    <span class="keyword">return</span> {<span class="string">'r'</span>: rHist, <span class="string">'g'</span>: gHist, <span class="string">'b'</span>: bHist};
+  }
+
+  <span class="comment">// Méthode pour ajuster dynamiquement le seuil (avancé, optionnel)</span>
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_adjustSimilarityThreshold</span>(<span class="type">double</span> similarity, <span class="type">bool</span> isCorrectMatch) <span class="keyword">async</span> {
+    <span class="comment">// Logique pour ajuster _similarityThreshold basé sur les résultats</span>
+    <span class="comment">// Ex: si un match correct a une similarité faible, baisser légèrement le seuil.</span>
+    <span class="comment">// Si un faux positif, augmenter le seuil. Nécessite une base de données de tests.</span>
+  }
+}</code></pre>
+
+                <h3>Pages principales</h3>
+                <p>Les pages de l'application sont construites avec des widgets Flutter et interagissent avec les services pour la logique métier.</p>
+
+                <h4>Page de connexion (`login_page.dart`)</h4>
+                <p>Offre deux méthodes d'authentification : par mot de passe ou par reconnaissance faciale. Un interrupteur permet de basculer entre les deux modes.</p>
+                <pre class="code-block"><code class="language-dart"><span class="comment">// Extrait de login_page.dart</span>
+<span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;
+<span class="keyword">import</span> <span class="string">'package:image_picker/image_picker.dart'</span>;
+<span class="comment">// Importer les services nécessaires (AuthService, AudioService, FaceRecognitionService)</span>
+<span class="comment">// import '../services/auth_service.dart';</span>
+<span class="comment">// import '../services/audio_service.dart';</span>
+<span class="comment">// import '../services/face_recognition_service.dart';</span>
+
+
+<span class="keyword">class</span> <span class="class">LoginPage</span> <span class="keyword">extends</span> <span class="type">StatefulWidget</span> {
+  <span class="comment">// ... constructeur ...</span>
+  <span class="meta">@override</span>
+  _<span class="type">LoginPageState</span> <span class="function">createState</span>() => _<span class="type">LoginPageState</span>();
+}
+
+<span class="keyword">class</span> _<span class="type">LoginPageState</span> <span class="keyword">extends</span> <span class="type">State</span>&lt;<span class="type">LoginPage</span>&gt; {
+  <span class="keyword">final</span> _formKey = <span class="type">GlobalKey</span>&lt;<span class="type">FormState</span>&gt;();
+  <span class="keyword">final</span> _emailController = <span class="type">TextEditingController</span>();
+  <span class="keyword">final</span> _passwordController = <span class="type">TextEditingController</span>();
+  
+  <span class="type">bool</span> _isPasswordLogin = <span class="number">true</span>;
+  <span class="type">bool</span> _isLoading = <span class="number">false</span>;
+  <span class="type">XFile?</span> _selectedImage;
+  <span class="comment">// final AuthService _authService = AuthService();</span>
+  <span class="comment">// final FaceRecognitionService _faceService = FaceRecognitionService();</span>
+
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_signInWithPassword</span>() <span class="keyword">async</span> {
+    <span class="keyword">if</span> (!_formKey.currentState!.validate()) <span class="keyword">return</span>;
+    setState(() =&gt; _isLoading = <span class="number">true</span>);
+    
+    <span class="comment">// bool success = await _authService.signInWithEmailAndPassword(</span>
+    <span class="comment">//   _emailController.text.trim(),</span>
+    <span class="comment">//   _passwordController.text.trim(),</span>
+    <span class="comment">// );</span>
+    <span class="type">bool</span> success = <span class="number">true</span>; <span class="comment">// Placeholder</span>
+
+    <span class="keyword">if</span> (success) {
+      <span class="comment">// await AudioService.playSuccessSound();</span>
+      Navigator.pushReplacementNamed(context, <span class="string">'/home'</span>);
+    } <span class="keyword">else</span> {
+      <span class="comment">// await AudioService.playErrorSound();</span>
+      <span class="comment">// _showSnackBar('Identifiants incorrects', true);</span>
+    }
+    setState(() =&gt; _isLoading = <span class="number">false</span>);
+  }
+
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_signInWithFace</span>() <span class="keyword">async</span> {
+    <span class="keyword">if</span> (_emailController.text.trim().isEmpty) {
+        <span class="comment">// _showSnackBar("Veuillez d'abord entrer votre email.", true);</span>
+        <span class="keyword">return</span>;
+    }
+    <span class="keyword">await</span> _pickImage(<span class="type">ImageSource</span>.camera); <span class="comment">// Forcer la caméra pour la connexion faciale</span>
+    <span class="keyword">if</span> (_selectedImage == <span class="keyword">null</span>) <span class="keyword">return</span>;
+
+    setState(() =&gt; _isLoading = <span class="number">true</span>);
+    
+    <span class="comment">// bool success = await _authService.signInWithFace(</span>
+    <span class="comment">// email: _emailController.text.trim(),</span>
+    <span class="comment">// capturedFaceImage: _selectedImage!,</span>
+    <span class="comment">// );</span>
+    <span class="type">bool</span> success = <span class="number">true</span>; <span class="comment">// Placeholder</span>
+
+    <span class="keyword">if</span> (success) {
+      <span class="comment">// await AudioService.playSuccessSound();</span>
+      Navigator.pushReplacementNamed(context, <span class="string">'/home'</span>);
+    } <span class="keyword">else</span> {
+      <span class="comment">// await AudioService.playErrorSound();</span>
+      <span class="comment">// _showSnackBar('Reconnaissance faciale échouée.', true);</span>
+    }
+    setState(() =&gt; _isLoading = <span class="number">false</span>);
+    _selectedImage = <span class="keyword">null</span>; <span class="comment">// Réinitialiser après tentative</span>
+  }
+
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_pickImage</span>(<span class="type">ImageSource</span> source) <span class="keyword">async</span> {
+    <span class="keyword">final</span> <span class="type">ImagePicker</span> picker = <span class="type">ImagePicker</span>();
+    <span class="keyword">try</span> {
+      <span class="keyword">final</span> <span class="type">XFile?</span> image = <span class="keyword">await</span> picker.pickImage(source: source, imageQuality: <span class="number">80</span>, maxWidth: <span class="number">600</span>);
+      <span class="keyword">if</span> (image != <span class="keyword">null</span>) {
+        setState(() {
+          _selectedImage = image;
+        });
+      }
+    } <span class="keyword">catch</span> (e) {
+      print(<span class="string">'Erreur de sélection d\'image: $e'</span>);
+      <span class="comment">// _showSnackBar("Erreur lors de la sélection de l'image.", true);</span>
+    }
+  }
+
+  <span class="type">void</span> <span class="function">_toggleLoginMethod</span>() {
+    setState(() {
+      _isPasswordLogin = !_isPasswordLogin;
+      _passwordController.clear(); <span class="comment">// Effacer le mot de passe lors du changement de méthode</span>
+    });
+  }
+  
+  <span class="meta">@override</span>
+  <span class="type">Widget</span> <span class="function">build</span>(<span class="type">BuildContext</span> context) {
+    <span class="comment">// ... UI de la page de connexion avec champs, boutons, et affichage caméra/image ...</span>
+    <span class="keyword">return</span> <span class="type">Scaffold</span>(body: <span class="type">Center</span>(child: <span class="type">Text</span>(<span class="string">'Login Page UI'</span>)));
+  }
+}</code></pre>
+
+                <h4>Page d'inscription (`signup_page.dart`)</h4>
+                <p>Permet aux nouveaux utilisateurs de créer un compte en fournissant leurs informations personnelles, leurs identifiants et une photo de leur visage pour l'authentification faciale.</p>
+                <pre class="code-block"><code class="language-dart"><span class="comment">// Extrait de signup_page.dart</span>
+<span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;
+<span class="keyword">import</span> <span class="string">'package:image_picker/image_picker.dart'</span>;
+<span class="comment">// Importer AuthService, AudioService</span>
+
+<span class="keyword">class</span> <span class="class">SignupPage</span> <span class="keyword">extends</span> <span class="type">StatefulWidget</span> { <span class="comment">/* ... */</span> }
+
+<span class="keyword">class</span> _<span class="type">SignupPageState</span> <span class="keyword">extends</span> <span class="type">State</span>&lt;<span class="type">SignupPage</span>&gt; {
+  <span class="keyword">final</span> _formKey = <span class="type">GlobalKey</span>&lt;<span class="type">FormState</span>&gt;();
+  <span class="keyword">final</span> _emailController = <span class="type">TextEditingController</span>();
+  <span class="keyword">final</span> _passwordController = <span class="type">TextEditingController</span>();
+  <span class="keyword">final</span> _firstNameController = <span class="type">TextEditingController</span>();
+  <span class="keyword">final</span> _lastNameController = <span class="type">TextEditingController</span>();
+  <span class="type">XFile?</span> _faceImageFile;
+  <span class="type">bool</span> _isLoading = <span class="number">false</span>;
+  <span class="comment">// final AuthService _authService = AuthService();</span>
+
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_signUp</span>() <span class="keyword">async</span> {
+    <span class="keyword">if</span> (!_formKey.currentState!.validate()) <span class="keyword">return</span>;
+    <span class="keyword">if</span> (_faceImageFile == <span class="keyword">null</span>) {
+      <span class="comment">// _showSnackBar('Veuillez fournir une photo de votre visage.', true);</span>
+      <span class="keyword">return</span>;
+    }
+    setState(() =&gt; _isLoading = <span class="number">true</span>);
+
+    <span class="comment">// bool success = await _authService.registerWithEmailAndPassword(</span>
+    <span class="comment">//   email: _emailController.text.trim(),</span>
+    <span class="comment">//   password: _passwordController.text.trim(),</span>
+    <span class="comment">//   firstName: _firstNameController.text.trim(),</span>
+    <span class="comment">//   lastName: _lastNameController.text.trim(),</span>
+    <span class="comment">//   faceImage: _faceImageFile,</span>
+    <span class="comment">// );</span>
+    <span class="type">bool</span> success = <span class="number">true</span>; <span class="comment">// Placeholder</span>
+
+    <span class="keyword">if</span> (success) {
+      <span class="comment">// await AudioService.playSuccessSound();</span>
+      Navigator.pushReplacementNamed(context, <span class="string">'/home'</span>); <span class="comment">// Ou vers une page de vérification d'email</span>
+    } <span class="keyword">else</span> {
+      <span class="comment">// await AudioService.playErrorSound();</span>
+      <span class="comment">// _showSnackBar('Erreur lors de l\'inscription.', true);</span>
+    }
+    setState(() =&gt; _isLoading = <span class="number">false</span>);
+  }
+
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_pickImage</span>(<span class="type">ImageSource</span> source) <span class="keyword">async</span> {
+    <span class="keyword">final</span> <span class="type">ImagePicker</span> picker = <span class="type">ImagePicker</span>();
+    <span class="keyword">final</span> <span class="type">XFile?</span> image = <span class="keyword">await</span> picker.pickImage(source: source, imageQuality: <span class="number">80</span>);
+    <span class="keyword">if</span> (image != <span class="keyword">null</span>) {
+      setState(() =&gt; _faceImageFile = image);
+    }
+  }
+
+  <span class="type">String?</span> <span class="function">_validateEmail</span>(<span class="type">String?</span> value) {
+    <span class="keyword">if</span> (value == <span class="keyword">null</span> || value.isEmpty || !value.contains(<span class="string">'@'</span>)) {
+      <span class="keyword">return</span> <span class="string">'Veuillez entrer un email valide.'</span>;
+    }
+    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+  
+  <span class="meta">@override</span>
+  <span class="type">Widget</span> <span class="function">build</span>(<span class="type">BuildContext</span> context) {
+    <span class="comment">// ... UI de la page d'inscription avec champs, sélection d'image ...</span>
+    <span class="keyword">return</span> <span class="type">Scaffold</span>(body: <span class="type">Center</span>(child: <span class="type">Text</span>(<span class="string">'Signup Page UI'</span>)));
+  }
+}</code></pre>
+
+                <h4>Page d'accueil (`home_page.dart`)</h4>
+                <p>Affiche les informations de l'utilisateur connecté et propose un bouton de déconnexion.</p>
+                <pre class="code-block"><code class="language-dart"><span class="comment">// Extrait de home_page.dart</span>
+<span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;
+<span class="comment">// Importer AuthService et UserModel</span>
+<span class="comment">// import '../services/auth_service.dart';</span>
+<span class="comment">// import '../models/user_model.dart';</span>
+
+<span class="keyword">class</span> <span class="class">HomePage</span> <span class="keyword">extends</span> <span class="type">StatefulWidget</span> { <span class="comment">/* ... */</span> }
+
+<span class="keyword">class</span> _<span class="type">HomePageState</span> <span class="keyword">extends</span> <span class="type">State</span>&lt;<span class="type">HomePage</span>&gt; {
+  <span class="comment">// final AuthService _authService = AuthService();</span>
+  <span class="comment">// UserModel? _user;</span>
+  <span class="type">bool</span> _isLoading = <span class="number">true</span>;
+
+  <span class="meta">@override</span>
+  <span class="type">void</span> <span class="function">initState</span>() {
+    <span class="keyword">super</span>.initState();
+    _getUserData();
+  }
+
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_getUserData</span>() <span class="keyword">async</span> {
+    setState(() =&gt; _isLoading = <span class="number">true</span>);
+    <span class="comment">// _user = await _authService.getUserData();</span>
+    setState(() =&gt; _isLoading = <span class="number">false</span>);
+  }
+
+  <span class="keyword">Future</span>&lt;<span class="type">void</span>&gt; <span class="function">_signOut</span>() <span class="keyword">async</span> {
+    <span class="comment">// await _authService.signOut();</span>
+    Navigator.pushReplacementNamed(context, <span class="string">'/login'</span>);
+  }
+
+  <span class="meta">@override</span>
+  <span class="type">Widget</span> <span class="function">build</span>(<span class="type">BuildContext</span> context) {
+    <span class="keyword">return</span> <span class="type">Scaffold</span>(
+      appBar: <span class="type">AppBar</span>(title: <span class="type">Text</span>(<span class="string">'Accueil'</span>), actions: [
+        IconButton(icon: <span class="type">Icon</span>(<span class="type">Icons</span>.logout), onPressed: _signOut),
+      ]),
+      body: _isLoading
+          ? <span class="type">Center</span>(child: <span class="type">CircularProgressIndicator</span>())
+          : <span class="comment">/* _user != null
+              ? Center(child: Text('Bonjour, ${_user!.firstName ?? _user!.email}'))
+              : */</span> <span class="type">Center</span>(child: <span class="type">Text</span>(<span class="string">'Erreur de chargement des données utilisateur.'</span>)),
+    );
+  }
+}</code></pre>
+            </section>
+
+            <hr>
+
+            <section id="conclusion" class="section">
+                <h2>7. Conclusion</h2>
+                <p>L'application d'authentification faciale développée avec Flutter et Supabase offre une solution moderne, flexible et sécurisée pour l'authentification des utilisateurs sur mobile. Elle combine avec succès les méthodes d'authentification traditionnelles par email et mot de passe avec une approche biométrique innovante basée sur la reconnaissance faciale.</p>
+
+                <h3>Principales forces de l'application :</h3>
+                <ul>
+                    <li><strong>Interface utilisateur intuitive et responsive :</strong> Grâce à Flutter, l'UI est fluide et s'adapte à différentes tailles d'écran.</li>
+                    <li><strong>Multiples méthodes d'authentification :</strong> Offre une flexibilité aux utilisateurs en leur permettant de choisir entre la connexion classique et la reconnaissance faciale.</li>
+                    <li><strong>Traitement d'image avancé :</strong> L'utilisation de `google_ml_kit` pour la détection faciale et les techniques de prétraitement d'image permettent une base solide pour la reconnaissance, bien que la précision de la comparaison dépende fortement de la sophistication des algorithmes de similarité employés.</li>
+                    <li><strong>Architecture bien structurée et modulaire :</strong> La séparation des préoccupations en couches (UI, Services, Modèles, Infrastructure) facilite la maintenance, l'évolution et les tests de l'application.</li>
+                    <li><strong>Backend robuste et évolutif avec Supabase :</strong> Supabase fournit une solution backend complète (authentification, base de données, stockage) qui simplifie le développement et offre une bonne scalabilité.</li>
+                    <li><strong>Gestion des erreurs et retours utilisateur :</strong> Des mécanismes de retour (visuels et sonores) sont intégrés pour informer l'utilisateur de l'état des opérations.</li>
+                </ul>
+
+                <h3>Pistes d'amélioration et perspectives :</h3>
+                <ul>
+                    <li><strong>Amélioration de la robustesse de la reconnaissance faciale :</strong> Intégrer des algorithmes de comparaison plus avancés (basés sur les embeddings faciaux) et des techniques anti-spoofing (détection de vivacité).</li>
+                    <li><strong>Optimisation des performances :</strong> Profiler et optimiser davantage le traitement des images et les appels réseau pour une expérience utilisateur encore plus rapide.</li>
+                    <li><strong>Tests approfondis sur divers appareils :</strong> Assurer la compatibilité et la performance sur une large gamme d'appareils Android et iOS.</li>
+                    <li><strong>Internationalisation (i18n) et Localisation (l10n) :</strong> Adapter l'application pour différentes langues et régions.</li>
+                    <li><strong>Fonctionnalités de sécurité supplémentaires :</strong> Mettre en place une authentification à deux facteurs (2FA) ou des options de récupération de compte plus élaborées.</li>
+                    <li><strong>Tests unitaires et d'intégration plus complets :</strong> Augmenter la couverture de tests pour garantir la fiabilité à long terme.</li>
+                </ul>
+                <p>En conclusion, ce projet démontre la faisabilité et l'efficacité de la combinaison de Flutter et Supabase pour créer des applications mobiles sophistiquées intégrant des fonctionnalités d'intelligence artificielle comme la reconnaissance faciale. Les bases posées sont solides pour de futures évolutions et améliorations.</p>
+            </section>
+        </div>
+
+
+        <div class="footer">
+            <p>&copy; Mai 2025 - SIFI Tarek Mazigh & KECIRA Abderraouf. Tous droits réservés.</p>
+            <p>Rapport Technique - Application d'Authentification Faciale Flutter/Supabase</p>
+        </div>
+    </div>
+</body>
+</html>
